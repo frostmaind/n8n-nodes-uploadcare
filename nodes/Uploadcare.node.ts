@@ -47,9 +47,9 @@ import {
 
 export class Uploadcare implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'Uploadcare (Full API)',
+    displayName: 'Uploadcare API',
     name: 'uploadcare',
-    icon: 'file:uploadcare.svg',
+    icon: 'file:uploadcare-logo.svg',
     group: ['transform'],
     version: 1,
     description: 'Full-featured Uploadcare integration for n8n (all upload-client and rest-client methods)',
