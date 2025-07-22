@@ -1,16 +1,10 @@
-const path = require('path');
-const { task, src, dest } = require('gulp');
+const gulp = require('gulp');
+const ts = require('gulp-typescript');
+const tsProject = ts.createProject('tsconfig.json');
 
-task('build:icons', copyIcons);
-
-function copyIcons() {
-	const nodeSource = path.resolve('nodes', '**', '*.{png,svg}');
-	const nodeDestination = path.resolve('dist', 'nodes');
-
-	src(nodeSource).pipe(dest(nodeDestination));
-
-	const credSource = path.resolve('credentials', '**', '*.{png,svg}');
-	const credDestination = path.resolve('dist', 'credentials');
-
-	return src(credSource).pipe(dest(credDestination));
-}
+gulp.task('build', function () {
+  return tsProject
+    .src()
+    .pipe(tsProject())
+    .pipe(gulp.dest('dist'));
+});
