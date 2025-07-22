@@ -243,6 +243,14 @@ export class Uploadcare implements INodeType {
         description: 'Remote storage target name (for copyFileToRemoteStorage)',
         displayOptions: { show: { operation: ['copyFileToRemoteStorage'] } },
       },
+      {
+        displayName: 'File Name',
+        name: 'fileName',
+        type: 'string',
+        default: '',
+        description: 'Custom name for the uploaded file (optional)',
+        displayOptions: { show: { operation: ['uploadFile', 'uploadDirect', 'uploadMultipart', 'uploadFromUrl'] } },
+      },
     ],
   };
 
@@ -255,12 +263,18 @@ export class Uploadcare implements INodeType {
 
     for (let i = 0; i < items.length; i++) {
       const op = this.getNodeParameter('operation', i) as string;
+      const fileName = this.getNodeParameter('fileName', i, '') as string;
       let res: any;
 
       // --- upload-client methods ---
       if (op === 'uploadFile') {
         const bin = await this.helpers.getBinaryDataBuffer(i, this.getNodeParameter('binaryProperty', i) as string);
-        res = await uploadFile(bin, { publicKey: creds.publicKey });
+        const options = { publicKey: creds.publicKey };
+        if (fileName) {
+          // @ts-ignore
+          options.fileName = fileName;
+        }
+        res = await uploadFile(bin, options);
       } else if (op === 'uploadFileGroup') {
         const binaryProperties = this.getNodeParameter('binaryProperties', i) as string;
         const uuids = this.getNodeParameter('uuids', i, []) as string[];
@@ -273,15 +287,30 @@ export class Uploadcare implements INodeType {
         }
         res = await uploadFileGroup(files, { publicKey: creds.publicKey });
       } else if (op === 'uploadFromUrl') {
-        res = await uploadFromUrl(this.getNodeParameter('sourceUrl', i) as string, { publicKey: creds.publicKey });
+        const options = { publicKey: creds.publicKey };
+        if (fileName) {
+          // @ts-ignore
+          options.filename = fileName;
+        }
+        res = await uploadFromUrl(this.getNodeParameter('sourceUrl', i) as string, options);
       } else if (op === 'uploadFromUploaded') {
         res = await uploadFromUploaded(this.getNodeParameter('uuid', i) as string, { publicKey: creds.publicKey });
       } else if (op === 'uploadDirect') {
         const bin = await this.helpers.getBinaryDataBuffer(i, this.getNodeParameter('binaryProperty', i) as string);
-        res = await uploadDirect(bin, { publicKey: creds.publicKey });
+        const options = { publicKey: creds.publicKey };
+        if (fileName) {
+          // @ts-ignore
+          options.fileName = fileName;
+        }
+        res = await uploadDirect(bin, options);
       } else if (op === 'uploadMultipart') {
         const bin = await this.helpers.getBinaryDataBuffer(i, this.getNodeParameter('binaryProperty', i) as string);
-        res = await uploadMultipart(bin, { publicKey: creds.publicKey });
+        const options = { publicKey: creds.publicKey };
+        if (fileName) {
+          // @ts-ignore
+          options.fileName = fileName;
+        }
+        res = await uploadMultipart(bin, options);
       }
       // --- rest-client methods ---
       else if (op === 'listOfFiles') {
