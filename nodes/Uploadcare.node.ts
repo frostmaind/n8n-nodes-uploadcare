@@ -44,6 +44,7 @@ import {
   addonExecutionStatus,
   WebhookEvent,
 } from '@uploadcare/rest-client';
+import { stringify } from 'querystring';
 
 export class Uploadcare implements INodeType {
   description: INodeTypeDescription = {
@@ -269,11 +270,12 @@ export class Uploadcare implements INodeType {
       // --- upload-client methods ---
       if (op === 'uploadFile') {
         const bin = await this.helpers.getBinaryDataBuffer(i, this.getNodeParameter('binaryProperty', i) as string);
-        const options = { publicKey: creds.publicKey };
-        if (fileName) {
-          // @ts-ignore
-          options.fileName = fileName;
-        }
+        const options = { publicKey: creds.publicKey, fileName: "" };
+
+				const binaryPropertyName = this.getNodeParameter('binaryProperty', i) as string;
+      	const binaryData = items[i].binary?.[binaryPropertyName];
+      	options.fileName = fileName || binaryData?.fileName || 'file';
+
         res = await uploadFile(bin, options);
       } else if (op === 'uploadFileGroup') {
         const binaryProperties = this.getNodeParameter('binaryProperties', i) as string;
@@ -297,19 +299,21 @@ export class Uploadcare implements INodeType {
         res = await uploadFromUploaded(this.getNodeParameter('uuid', i) as string, { publicKey: creds.publicKey });
       } else if (op === 'uploadDirect') {
         const bin = await this.helpers.getBinaryDataBuffer(i, this.getNodeParameter('binaryProperty', i) as string);
-        const options = { publicKey: creds.publicKey };
-        if (fileName) {
-          // @ts-ignore
-          options.fileName = fileName;
-        }
-        res = await uploadDirect(bin, options);
+        const options = { publicKey: creds.publicKey, fileName: "" };
+
+				const binaryPropertyName = this.getNodeParameter('binaryProperty', i) as string;
+      	const binaryData = items[i].binary?.[binaryPropertyName];
+      	options.fileName = fileName || binaryData?.fileName || 'file';
+
+				res = await uploadDirect(bin, options);
       } else if (op === 'uploadMultipart') {
         const bin = await this.helpers.getBinaryDataBuffer(i, this.getNodeParameter('binaryProperty', i) as string);
-        const options = { publicKey: creds.publicKey };
-        if (fileName) {
-          // @ts-ignore
-          options.fileName = fileName;
-        }
+        const options = { publicKey: creds.publicKey, fileName: ""  };
+
+				const binaryPropertyName = this.getNodeParameter('binaryProperty', i) as string;
+      	const binaryData = items[i].binary?.[binaryPropertyName];
+      	options.fileName = fileName || binaryData?.fileName || 'file';
+
         res = await uploadMultipart(bin, options);
       }
       // --- rest-client methods ---
